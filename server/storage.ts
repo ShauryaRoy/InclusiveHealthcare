@@ -1,202 +1,236 @@
 import { 
-  users, appointments, contactMessages, services,
-  type User, type InsertUser, type Appointment, type InsertAppointment,
-  type ContactMessage, type InsertContactMessage, type Service, type InsertService
-} from "@shared/schema";
+  User, Appointment, ContactMessage, Service,
+  type UserType, type AppointmentType, type ContactMessageType, type ServiceType
+} from "@shared/models";
 
 export interface IStorage {
   // User operations
-  getUser(id: number): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
-  getUserByEmail(email: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
+  getUser(id: string): Promise<UserType | null>;
+  getUserByUsername(username: string): Promise<UserType | null>;
+  getUserByEmail(email: string): Promise<UserType | null>;
+  createUser(user: Omit<UserType, '_id' | 'createdAt'>): Promise<UserType>;
 
   // Appointment operations
-  getAppointment(id: number): Promise<Appointment | undefined>;
-  getAppointmentsByEmail(email: string): Promise<Appointment[]>;
-  createAppointment(appointment: InsertAppointment): Promise<Appointment>;
-  updateAppointmentPayment(id: number, paymentIntentId: string): Promise<Appointment | undefined>;
+  getAppointment(id: string): Promise<AppointmentType | null>;
+  getAppointmentsByEmail(email: string): Promise<AppointmentType[]>;
+  createAppointment(appointment: Omit<AppointmentType, '_id' | 'status' | 'paymentIntentId' | 'amount' | 'createdAt'>): Promise<AppointmentType>;
+  updateAppointmentPayment(id: string, paymentIntentId: string): Promise<AppointmentType | null>;
   
   // Contact message operations
-  createContactMessage(message: InsertContactMessage): Promise<ContactMessage>;
-  getContactMessages(): Promise<ContactMessage[]>;
+  createContactMessage(message: Omit<ContactMessageType, '_id' | 'status' | 'createdAt'>): Promise<ContactMessageType>;
+  getContactMessages(): Promise<ContactMessageType[]>;
   
   // Service operations
-  getServices(): Promise<Service[]>;
-  getService(id: number): Promise<Service | undefined>;
-  createService(service: InsertService): Promise<Service>;
+  getServices(): Promise<ServiceType[]>;
+  getService(id: string): Promise<ServiceType | null>;
+  createService(service: Omit<ServiceType, '_id'>): Promise<ServiceType>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private appointments: Map<number, Appointment>;
-  private contactMessages: Map<number, ContactMessage>;
-  private services: Map<number, Service>;
-  private currentUserId: number;
-  private currentAppointmentId: number;
-  private currentContactMessageId: number;
-  private currentServiceId: number;
-
+export class MongoStorage implements IStorage {
   constructor() {
-    this.users = new Map();
-    this.appointments = new Map();
-    this.contactMessages = new Map();
-    this.services = new Map();
-    this.currentUserId = 1;
-    this.currentAppointmentId = 1;
-    this.currentContactMessageId = 1;
-    this.currentServiceId = 1;
-
-    // Initialize default services
+    // Initialize default services if they don't exist
     this.initializeServices();
   }
 
-  private initializeServices() {
-    const defaultServices: Omit<Service, 'id'>[] = [
-      {
-        name: "General Medicine",
-        description: "Comprehensive primary care and preventive health services",
-        category: "Primary Care",
-        price: "150.00",
-        duration: 30,
-        available: true,
-      },
-      {
-        name: "Emergency Care",
-        description: "24/7 emergency medical services with multilingual staff",
-        category: "Emergency",
-        price: "500.00",
-        duration: 60,
-        available: true,
-      },
-      {
-        name: "Cardiology",
-        description: "Heart health diagnostics and treatment",
-        category: "Specialty",
-        price: "300.00",
-        duration: 45,
-        available: true,
-      },
-      {
-        name: "Pediatrics",
-        description: "Specialized care for children and adolescents",
-        category: "Specialty",
-        price: "200.00",
-        duration: 30,
-        available: true,
-      },
-      {
-        name: "Mental Health",
-        description: "Culturally-informed mental health services and counseling",
-        category: "Mental Health",
-        price: "250.00",
-        duration: 60,
-        available: true,
-      },
-      {
-        name: "Rehabilitation",
-        description: "Physical and occupational therapy services",
-        category: "Therapy",
-        price: "180.00",
-        duration: 45,
-        available: true,
-      },
-    ];
+  private async initializeServices() {
+    try {
+      const existingServices = await Service.countDocuments();
+      if (existingServices === 0) {
+        const defaultServices = [
+          {
+            name: "General Medicine",
+            description: "Comprehensive primary care and preventive health services",
+            category: "Primary Care",
+            price: "150.00",
+            duration: 30,
+            available: true,
+          },
+          {
+            name: "Emergency Care",
+            description: "24/7 emergency medical services with multilingual staff",
+            category: "Emergency",
+            price: "500.00",
+            duration: 60,
+            available: true,
+          },
+          {
+            name: "Cardiology",
+            description: "Heart health diagnostics and treatment",
+            category: "Specialty",
+            price: "300.00",
+            duration: 45,
+            available: true,
+          },
+          {
+            name: "Pediatrics",
+            description: "Specialized care for children and adolescents",
+            category: "Specialty",
+            price: "200.00",
+            duration: 30,
+            available: true,
+          },
+          {
+            name: "Mental Health",
+            description: "Culturally-informed mental health services and counseling",
+            category: "Mental Health",
+            price: "250.00",
+            duration: 60,
+            available: true,
+          },
+          {
+            name: "Rehabilitation",
+            description: "Physical and occupational therapy services",
+            category: "Therapy",
+            price: "180.00",
+            duration: 45,
+            available: true,
+          },
+        ];
 
-    defaultServices.forEach(service => {
-      const newService: Service = {
-        ...service,
-        id: this.currentServiceId++,
-      };
-      this.services.set(newService.id, newService);
-    });
-  }
-
-  async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
-  }
-
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(user => user.username === username);
-  }
-
-  async getUserByEmail(email: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(user => user.email === email);
-  }
-
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.currentUserId++;
-    const user: User = {
-      ...insertUser,
-      id,
-      createdAt: new Date(),
-    };
-    this.users.set(id, user);
-    return user;
-  }
-
-  async getAppointment(id: number): Promise<Appointment | undefined> {
-    return this.appointments.get(id);
-  }
-
-  async getAppointmentsByEmail(email: string): Promise<Appointment[]> {
-    return Array.from(this.appointments.values()).filter(appointment => appointment.email === email);
-  }
-
-  async createAppointment(insertAppointment: InsertAppointment): Promise<Appointment> {
-    const id = this.currentAppointmentId++;
-    const appointment: Appointment = {
-      ...insertAppointment,
-      id,
-      status: "scheduled",
-      paymentIntentId: null,
-      amount: "75.00",
-      createdAt: new Date(),
-    };
-    this.appointments.set(id, appointment);
-    return appointment;
-  }
-
-  async updateAppointmentPayment(id: number, paymentIntentId: string): Promise<Appointment | undefined> {
-    const appointment = this.appointments.get(id);
-    if (appointment) {
-      appointment.paymentIntentId = paymentIntentId;
-      this.appointments.set(id, appointment);
-      return appointment;
+        await Service.insertMany(defaultServices);
+        console.log('✅ Default services initialized');
+      }
+    } catch (error) {
+      console.error('Error initializing services:', error);
     }
-    return undefined;
   }
 
-  async createContactMessage(insertMessage: InsertContactMessage): Promise<ContactMessage> {
-    const id = this.currentContactMessageId++;
-    const message: ContactMessage = {
-      ...insertMessage,
-      id,
-      status: "unread",
-      createdAt: new Date(),
-    };
-    this.contactMessages.set(id, message);
-    return message;
+  async getUser(id: string): Promise<UserType | null> {
+    try {
+      return await User.findById(id).lean();
+    } catch (error) {
+      console.error('Error getting user:', error);
+      return null;
+    }
   }
 
-  async getContactMessages(): Promise<ContactMessage[]> {
-    return Array.from(this.contactMessages.values());
+  async getUserByUsername(username: string): Promise<UserType | null> {
+    try {
+      return await User.findOne({ username }).lean();
+    } catch (error) {
+      console.error('Error getting user by username:', error);
+      return null;
+    }
   }
 
-  async getServices(): Promise<Service[]> {
-    return Array.from(this.services.values()).filter(service => service.available);
+  async getUserByEmail(email: string): Promise<UserType | null> {
+    try {
+      return await User.findOne({ email }).lean();
+    } catch (error) {
+      console.error('Error getting user by email:', error);
+      return null;
+    }
   }
 
-  async getService(id: number): Promise<Service | undefined> {
-    return this.services.get(id);
+  async createUser(userData: Omit<UserType, '_id' | 'createdAt'>): Promise<UserType> {
+    try {
+      const user = new User(userData);
+      const savedUser = await user.save();
+      return savedUser.toObject();
+    } catch (error) {
+      console.error('Error creating user:', error);
+      throw error;
+    }
   }
 
-  async createService(insertService: InsertService): Promise<Service> {
-    const id = this.currentServiceId++;
-    const service: Service = { ...insertService, id };
-    this.services.set(id, service);
-    return service;
+  async getAppointment(id: string): Promise<AppointmentType | null> {
+    try {
+      return await Appointment.findById(id).lean();
+    } catch (error) {
+      console.error('Error getting appointment:', error);
+      return null;
+    }
+  }
+
+  async getAppointmentsByEmail(email: string): Promise<AppointmentType[]> {
+    try {
+      return await Appointment.find({ email }).sort({ createdAt: -1 }).lean();
+    } catch (error) {
+      console.error('Error getting appointments by email:', error);
+      return [];
+    }
+  }
+
+  async createAppointment(appointmentData: Omit<AppointmentType, '_id' | 'status' | 'paymentIntentId' | 'amount' | 'createdAt'>): Promise<AppointmentType> {
+    try {
+      const appointment = new Appointment({
+        ...appointmentData,
+        status: 'scheduled',
+        amount: '75.00',
+      });
+      const savedAppointment = await appointment.save();
+      return savedAppointment.toObject();
+    } catch (error) {
+      console.error('Error creating appointment:', error);
+      throw error;
+    }
+  }
+
+  async updateAppointmentPayment(id: string, paymentIntentId: string): Promise<AppointmentType | null> {
+    try {
+      const updatedAppointment = await Appointment.findByIdAndUpdate(
+        id,
+        { paymentIntentId },
+        { new: true }
+      ).lean();
+      return updatedAppointment;
+    } catch (error) {
+      console.error('Error updating appointment payment:', error);
+      return null;
+    }
+  }
+
+  async createContactMessage(messageData: Omit<ContactMessageType, '_id' | 'status' | 'createdAt'>): Promise<ContactMessageType> {
+    try {
+      const message = new ContactMessage({
+        ...messageData,
+        status: 'unread',
+      });
+      const savedMessage = await message.save();
+      return savedMessage.toObject();
+    } catch (error) {
+      console.error('Error creating contact message:', error);
+      throw error;
+    }
+  }
+
+  async getContactMessages(): Promise<ContactMessageType[]> {
+    try {
+      return await ContactMessage.find().sort({ createdAt: -1 }).lean();
+    } catch (error) {
+      console.error('Error getting contact messages:', error);
+      return [];
+    }
+  }
+
+  async getServices(): Promise<ServiceType[]> {
+    try {
+      return await Service.find({ available: true }).lean();
+    } catch (error) {
+      console.error('Error getting services:', error);
+      return [];
+    }
+  }
+
+  async getService(id: string): Promise<ServiceType | null> {
+    try {
+      return await Service.findById(id).lean();
+    } catch (error) {
+      console.error('Error getting service:', error);
+      return null;
+    }
+  }
+
+  async createService(serviceData: Omit<ServiceType, '_id'>): Promise<ServiceType> {
+    try {
+      const service = new Service(serviceData);
+      const savedService = await service.save();
+      return savedService.toObject();
+    } catch (error) {
+      console.error('Error creating service:', error);
+      throw error;
+    }
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new MongoStorage();

@@ -5,8 +5,9 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import Stripe from "stripe";
 import { storage } from "./storage";
-import { insertAppointmentSchema, insertContactMessageSchema } from "@shared/schema";
+import { insertAppointmentSchema, insertContactMessageSchema } from "@shared/models";
 import { z } from "zod";
+import { connectToDatabase } from "./database";
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
@@ -17,6 +18,9 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Connect to MongoDB
+  await connectToDatabase();
+
   // Get all services
   app.get("/api/services", async (req, res) => {
     try {
