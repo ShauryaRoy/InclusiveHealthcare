@@ -119,11 +119,11 @@ export default function ServicesSection() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button variant="destructive" size="lg">
               <Phone className="w-5 h-5 mr-2" />
-              Emergency: 911
+              Emergency: 100
             </Button>
             <Button variant="outline" size="lg">
               <Phone className="w-5 h-5 mr-2" />
-              Main Line: (555) 123-4567
+              Main Line: 919191919919
             </Button>
           </div>
         </div>

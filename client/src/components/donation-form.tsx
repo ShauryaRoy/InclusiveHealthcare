@@ -17,6 +17,9 @@ import { Heart, CreditCard, Shield, CheckCircle } from "lucide-react";
 // Load Stripe
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY || "");
 
+// Debug: Log Stripe public key value
+console.log('VITE_STRIPE_PUBLIC_KEY:', import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+
 const donationFormSchema = z.object({
   amount: z.number().min(5, "Minimum donation is $5"),
   program: z.string().optional(),

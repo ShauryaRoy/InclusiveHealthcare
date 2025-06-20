@@ -18,7 +18,6 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Connect to MongoDB
   await connectToDatabase();
 
   // Get all services
