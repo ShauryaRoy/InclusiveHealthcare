@@ -57,7 +57,8 @@
 }
 
 @layer base {
-  @apply border border-gray-300;
+  /* Remove this invalid apply */
+  /* @apply border border-gray-300; */
 
   body {
     @apply bg-background text-foreground font-sans antialiased;
@@ -68,6 +69,7 @@
     scroll-behavior: smooth;
   }
 }
+
 
 @layer components {
   .btn-primary {
