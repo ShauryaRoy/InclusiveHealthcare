@@ -82,6 +82,7 @@ export class MemStorage implements IStorage {
     // Initialize default data
     this.initializeServices();
     this.initializeMedicines();
+    this.initializeDummyOrder();
   }
 
   private initializeServices() {
@@ -321,6 +322,45 @@ export class MemStorage implements IStorage {
         createdAt: new Date()
       };
       this.medicines.set(id, newMedicine);
+    });
+  }
+
+  private initializeDummyOrder() {
+    // Create dummy order that matches the frontend tracking page
+    const orderId = this.currentOrderId++;
+    const order: Order = {
+      id: orderId,
+      orderNumber: "ORD-2025-123456",
+      customerEmail: "john.doe@example.com",
+      customerName: "John Doe",
+      customerPhone: "(555) 123-4567",
+      shippingAddress: "123 Main Street, Apartment 4B, New York, NY 10001",
+      total: "89.97",
+      status: "confirmed",
+      trackingNumber: null,
+      estimatedDelivery: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+      paymentIntentId: "pi_dummy_payment_intent",
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.orders.set(orderId, order);
+
+    // Create order items for the dummy order
+    const medicines = [1, 4, 1]; // Acetaminophen, Vitamin D3, Acetaminophen (for Ibuprofen simulation)
+    const quantities = [2, 1, 1];
+    const prices = ["12.99", "15.99", "12.99"];
+
+    medicines.forEach((medicineId, index) => {
+      const itemId = this.currentOrderItemId++;
+      const orderItem: OrderItem = {
+        id: itemId,
+        orderId: orderId,
+        medicineId: medicineId,
+        quantity: quantities[index],
+        price: prices[index],
+        createdAt: new Date()
+      };
+      this.orderItems.set(itemId, orderItem);
     });
   }
 

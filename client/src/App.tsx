@@ -8,6 +8,7 @@ import Appointments from "@/pages/appointments";
 import Pharmacy from "@/pages/pharmacy-simple";
 import CaseStudies from "@/pages/case-studies";
 import Donate from "@/pages/donate";
+import TrackOrder from "@/pages/track-order";
 import NotFound from "@/pages/not-found";
 import { AccessibilityProvider } from "@/hooks/use-accessibility";
 
@@ -19,6 +20,7 @@ function Router() {
       <Route path="/pharmacy" component={Pharmacy} />
       <Route path="/case-studies" component={CaseStudies} />
       <Route path="/donate" component={Donate} />
+      <Route path="/track-order" component={TrackOrder} />
       <Route component={NotFound} />
     </Switch>
   );

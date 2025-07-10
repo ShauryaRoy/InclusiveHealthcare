@@ -331,7 +331,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Track order
+  // Track order with simulated progression
   app.get("/api/track/:orderNumber", async (req, res) => {
     try {
       const { orderNumber } = req.params;
@@ -341,12 +341,95 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Order not found" });
       }
 
+      // Simulate realistic order progression based on time elapsed
+      const now = new Date();
+      const orderTime = new Date(order.createdAt);
+      const hoursElapsed = (now.getTime() - orderTime.getTime()) / (1000 * 60 * 60);
+      
+      let currentStatus = order.status;
+      let progressSteps = [];
+      let estimatedDeliveryDate = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000); // 3 days default
+      
+      // Simulate carrier selection
+      const carriers = ["FedEx", "UPS", "USPS"];
+      const selectedCarrier = carriers[Math.floor(Math.random() * carriers.length)];
+      
+      // Generate realistic tracking number if not exists
+      let trackingNumber = order.trackingNumber;
+      if (!trackingNumber) {
+        const prefixes = { "FedEx": "FX", "UPS": "1Z", "USPS": "US" };
+        trackingNumber = `${prefixes[selectedCarrier]}${Date.now().toString().slice(-9)}${Math.floor(Math.random() * 1000)}`;
+      }
+      
+      // Define progression timeline - start with confirmed status showing initial progress
+      if (hoursElapsed < 0.5) {
+        currentStatus = "confirmed";
+        progressSteps = [
+          { status: "Order Placed", timestamp: orderTime, completed: true, description: "Your order has been received and is being prepared." },
+          { status: "Processing", timestamp: orderTime, completed: true, description: "Pharmacy is verifying and preparing your medications." },
+          { status: "Shipped", timestamp: null, completed: false, description: "Your order will be shipped soon." },
+          { status: "Out for Delivery", timestamp: null, completed: false, description: "Your package is on its way." },
+          { status: "Delivered", timestamp: null, completed: false, description: "Your medications have been delivered." }
+        ];
+      } else if (hoursElapsed < 2) {
+        currentStatus = "shipped";
+        estimatedDeliveryDate = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000); // 2 days
+        progressSteps = [
+          { status: "Order Placed", timestamp: orderTime, completed: true, description: "Your order has been received." },
+          { status: "Processing", timestamp: new Date(orderTime.getTime() + 30 * 60 * 1000), completed: true, description: "Medications verified and prepared." },
+          { status: "Shipped", timestamp: new Date(orderTime.getTime() + 2 * 60 * 60 * 1000), completed: true, description: `Package shipped via ${selectedCarrier}` },
+          { status: "Out for Delivery", timestamp: null, completed: false, description: "Your package is on its way." },
+          { status: "Delivered", timestamp: null, completed: false, description: "Your medications have been delivered." }
+        ];
+      } else if (hoursElapsed < 48) {
+        currentStatus = "in_transit";
+        estimatedDeliveryDate = new Date(Date.now() + 1 * 24 * 60 * 60 * 1000); // 1 day
+        progressSteps = [
+          { status: "Order Placed", timestamp: orderTime, completed: true, description: "Your order has been received." },
+          { status: "Processing", timestamp: new Date(orderTime.getTime() + 30 * 60 * 1000), completed: true, description: "Medications verified and prepared." },
+          { status: "Shipped", timestamp: new Date(orderTime.getTime() + 2 * 60 * 60 * 1000), completed: true, description: `Package shipped via ${selectedCarrier}` },
+          { status: "In Transit", timestamp: new Date(orderTime.getTime() + 6 * 60 * 60 * 1000), completed: true, description: "Package is in transit to your location." },
+          { status: "Out for Delivery", timestamp: null, completed: false, description: "Your package will be out for delivery soon." },
+          { status: "Delivered", timestamp: null, completed: false, description: "Your medications will be delivered." }
+        ];
+      } else if (hoursElapsed < 72) {
+        currentStatus = "out_for_delivery";
+        estimatedDeliveryDate = new Date(Date.now() + 4 * 60 * 60 * 1000); // 4 hours
+        progressSteps = [
+          { status: "Order Placed", timestamp: orderTime, completed: true, description: "Your order has been received." },
+          { status: "Processing", timestamp: new Date(orderTime.getTime() + 30 * 60 * 1000), completed: true, description: "Medications verified and prepared." },
+          { status: "Shipped", timestamp: new Date(orderTime.getTime() + 2 * 60 * 60 * 1000), completed: true, description: `Package shipped via ${selectedCarrier}` },
+          { status: "In Transit", timestamp: new Date(orderTime.getTime() + 6 * 60 * 60 * 1000), completed: true, description: "Package arrived at local facility." },
+          { status: "Out for Delivery", timestamp: new Date(orderTime.getTime() + 48 * 60 * 60 * 1000), completed: true, description: "Package is out for delivery today." },
+          { status: "Delivered", timestamp: null, completed: false, description: "Your medications will be delivered today." }
+        ];
+      } else {
+        currentStatus = "delivered";
+        const deliveryTime = new Date(orderTime.getTime() + 72 * 60 * 60 * 1000);
+        progressSteps = [
+          { status: "Order Placed", timestamp: orderTime, completed: true, description: "Your order has been received." },
+          { status: "Processing", timestamp: new Date(orderTime.getTime() + 30 * 60 * 1000), completed: true, description: "Medications verified and prepared." },
+          { status: "Shipped", timestamp: new Date(orderTime.getTime() + 2 * 60 * 60 * 1000), completed: true, description: `Package shipped via ${selectedCarrier}` },
+          { status: "In Transit", timestamp: new Date(orderTime.getTime() + 6 * 60 * 60 * 1000), completed: true, description: "Package arrived at local facility." },
+          { status: "Out for Delivery", timestamp: new Date(orderTime.getTime() + 48 * 60 * 60 * 1000), completed: true, description: "Package was out for delivery." },
+          { status: "Delivered", timestamp: deliveryTime, completed: true, description: "Package delivered successfully." }
+        ];
+      }
+
       res.json({
         orderNumber: order.orderNumber,
-        status: order.status,
-        trackingNumber: order.trackingNumber,
-        estimatedDelivery: order.estimatedDelivery,
+        status: currentStatus,
+        trackingNumber,
+        carrier: selectedCarrier,
+        estimatedDelivery: estimatedDeliveryDate.toLocaleDateString(),
         createdAt: order.createdAt,
+        progressSteps,
+        customerInfo: {
+          name: order.customerName,
+          email: order.customerEmail,
+          address: order.shippingAddress
+        },
+        orderTotal: order.total
       });
     } catch (error: any) {
       res.status(500).json({ message: "Error tracking order: " + error.message });
