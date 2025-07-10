@@ -4,24 +4,24 @@ import { Calendar, Phone } from "lucide-react";
 
 export default function HeroSection() {
   return (
-    <section
-      id="home"
+    <section 
+      id="home" 
       className="relative bg-gradient-to-br from-blue-50 to-teal-50 py-20"
       aria-labelledby="hero-heading"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div className="animate-fade-in">
-            <h1
-              id="hero-heading"
+            <h1 
+              id="hero-heading" 
               className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6"
             >
               Inclusive Healthcare for{" "}
               <span className="text-blue-600">Everyone</span>
             </h1>
             <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-              At HealthCare Plus, we believe quality healthcare should be accessible to all.
-              Our diverse team of medical professionals is committed to providing compassionate,
+              At HealthCare Plus, we believe quality healthcare should be accessible to all. 
+              Our diverse team of medical professionals is committed to providing compassionate, 
               culturally-sensitive care in a welcoming environment.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
@@ -32,14 +32,14 @@ export default function HeroSection() {
                 </Link>
               </Button>
               <Button asChild variant="outline" size="lg">
-                <Link href="/services">
+                <Link href="#services">
                   <span>Our Services</span>
                   <span className="ml-2">→</span>
                 </Link>
               </Button>
             </div>
           </div>
-
+          
           <div className="relative">
             <img
               src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600"

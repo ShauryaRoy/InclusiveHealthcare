@@ -23,7 +23,7 @@
   --destructive-foreground: 210 40% 98%;
   --ring: 214 100% 60%;
   --radius: 0.5rem;
-
+  
   /* Custom healthcare colors */
   --trust-blue: 214 100% 60%;
   --deep-blue: 217 91% 60%;
@@ -57,33 +57,33 @@
 }
 
 @layer base {
-  /* Remove this invalid apply */
-  /* @apply border border-gray-300; */
-
+  * {
+    @apply border-border;
+  }
+  
   body {
     @apply bg-background text-foreground font-sans antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
-
+  
   html {
     scroll-behavior: smooth;
   }
 }
 
-
 @layer components {
   .btn-primary {
     @apply bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
   }
-
+  
   .btn-secondary {
     @apply bg-gray-200 hover:bg-gray-300 text-gray-900 font-medium py-2 px-4 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2;
   }
-
+  
   .service-card {
     @apply bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 p-6 border border-gray-100;
   }
-
+  
   .staff-card {
     @apply bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300;
   }
@@ -165,15 +165,8 @@
 
 /* Animation for smooth transitions */
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .animate-fade-in {

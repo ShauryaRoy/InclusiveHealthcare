@@ -44,7 +44,7 @@ export default function AboutSection() {
       name: "Dr. Aisha Patel",
       role: "Pediatrics Director",
       languages: "Fluent in Hindi and English",
-      image: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=400ages.unsplash.com/photo-1594824708194-8abfdfb0b4eb?ixlib=rb-4.0.3&auto=format&fit=https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=400&w=400&h=400",
+      image: "https://images.unsplash.com/photo-1594824708194-8abfdfb0b4eb?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=400",
       alt: "Dr. Aisha Patel, a professional South Asian woman in medical scrubs smiling confidently",
     },
   ];
@@ -57,7 +57,7 @@ export default function AboutSection() {
             About HealthCare Plus
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Founded on principles of diversity, equity, and inclusion, we're committed to breaking down
+            Founded on principles of diversity, equity, and inclusion, we're committed to breaking down 
             barriers to healthcare access and providing exceptional care to patients from all backgrounds.
           </p>
         </div>

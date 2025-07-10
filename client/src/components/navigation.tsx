@@ -30,6 +30,7 @@ export default function Navigation() {
     { href: "/#about", label: "About" },
     { href: "/#services", label: "Services" },
     { href: "/appointments", label: "Appointments" },
+    { href: "/pharmacy", label: "Pharmacy" },
     { href: "/case-studies", label: "Case Studies" },
     { href: "/donate", label: "Donate" },
     { href: "/#contact", label: "Contact" },

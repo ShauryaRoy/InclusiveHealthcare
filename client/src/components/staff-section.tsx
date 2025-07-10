@@ -21,7 +21,7 @@ export default function StaffSection() {
       role: "Nurse Practitioner",
       languages: "English, Spanish",
       experience: "Specializes in family medicine and women's health with community outreach focus",
-      image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300",
+      image: "https://images.unsplash.com/photo-1594824708194-8abfdfb0b4eb?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300",
       alt: "Maria Rodriguez, a Latina nurse practitioner in professional nursing attire",
     },
     {
@@ -45,7 +45,7 @@ export default function StaffSection() {
       role: "Internal Medicine",
       languages: "English, Arabic, Urdu",
       experience: "Primary care physician with expertise in chronic disease management",
-      image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300",
+      image: "https://images.unsplash.com/photo-1594824708194-8abfdfb0b4eb?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300",
       alt: "Dr. Fatima Al-Rashid, a professional Middle Eastern woman in medical coat",
     },
   ];
@@ -58,7 +58,7 @@ export default function StaffSection() {
             Meet Our Diverse Medical Team
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Our healthcare professionals come from diverse backgrounds and speak multiple languages,
+            Our healthcare professionals come from diverse backgrounds and speak multiple languages, 
             ensuring every patient feels understood and comfortable.
           </p>
         </div>
@@ -96,8 +96,8 @@ export default function StaffSection() {
               Our Commitment to Diversity
             </h3>
             <p className="text-gray-600 mb-6">
-              We actively recruit healthcare professionals from diverse backgrounds to ensure our team
-              reflects the communities we serve. Our staff speaks over 15 languages and represents
+              We actively recruit healthcare professionals from diverse backgrounds to ensure our team 
+              reflects the communities we serve. Our staff speaks over 15 languages and represents 
               cultures from around the world.
             </p>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">

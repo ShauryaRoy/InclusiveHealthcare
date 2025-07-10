@@ -17,9 +17,6 @@ import { Heart, CreditCard, Shield, CheckCircle } from "lucide-react";
 // Load Stripe
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY || "");
 
-// Debug: Log Stripe public key value
-console.log('VITE_STRIPE_PUBLIC_KEY:', import.meta.env.VITE_STRIPE_PUBLIC_KEY);
-
 const donationFormSchema = z.object({
   amount: z.number().min(5, "Minimum donation is $5"),
   program: z.string().optional(),
@@ -30,11 +27,11 @@ const donationFormSchema = z.object({
 
 type DonationFormData = z.infer<typeof donationFormSchema>;
 
-function DonationCheckoutForm({
-  donationData,
-  clientSecret,
-  onSuccess
-}: {
+function DonationCheckoutForm({ 
+  donationData, 
+  clientSecret, 
+  onSuccess 
+}: { 
   donationData: DonationFormData;
   clientSecret: string;
   onSuccess: () => void;
@@ -94,7 +91,7 @@ function DonationCheckoutForm({
           Secure Donation - ${donationData.amount}
         </h3>
         <p className="text-sm text-green-700">
-          Your donation supports inclusive healthcare for underserved communities.
+          Your donation supports inclusive healthcare for underserved communities. 
           All donations are tax-deductible.
         </p>
       </div>
@@ -129,10 +126,10 @@ interface DonationFormProps {
   onSuccess?: () => void;
 }
 
-export default function DonationForm({
-  initialAmount = 25,
-  initialProgram = "",
-  onSuccess
+export default function DonationForm({ 
+  initialAmount = 25, 
+  initialProgram = "", 
+  onSuccess 
 }: DonationFormProps) {
   const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState<"form" | "payment" | "success">("form");
@@ -192,7 +189,7 @@ export default function DonationForm({
               Thank You for Your Donation!
             </h2>
             <p className="text-gray-600 mb-6">
-              Your generous contribution of ${donationData?.amount} will directly impact
+              Your generous contribution of ${donationData?.amount} will directly impact 
               patients in need of inclusive healthcare services.
             </p>
             <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
@@ -231,9 +228,9 @@ export default function DonationForm({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Elements
-            stripe={stripePromise}
-            options={{
+          <Elements 
+            stripe={stripePromise} 
+            options={{ 
               clientSecret,
               appearance: {
                 theme: "stripe",
@@ -270,7 +267,7 @@ export default function DonationForm({
             {/* Amount Selection */}
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Donation Amount</h3>
-
+              
               {/* Quick Amount Buttons */}
               <div className="grid grid-cols-3 gap-3 mb-4">
                 {predefinedAmounts.map((amount) => (
