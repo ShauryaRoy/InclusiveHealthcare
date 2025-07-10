@@ -31,6 +31,7 @@ export default function Navigation() {
     { href: "/#services", label: "Services" },
     { href: "/appointments", label: "Appointments" },
     { href: "/pharmacy", label: "Pharmacy" },
+    { href: "/track-order", label: "Track Order" },
     { href: "/case-studies", label: "Case Studies" },
     { href: "/donate", label: "Donate" },
     { href: "/#contact", label: "Contact" },
